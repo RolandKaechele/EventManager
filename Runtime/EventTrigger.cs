@@ -14,20 +14,23 @@ namespace EventManager.Runtime
     }
 
     /// <summary>
-    /// Fires a <see cref="GameEvent"/> in response to common Unity scene lifecycle events
-    /// or physics triggers without requiring any code.
+    /// Fires a <see cref="GameEvent"/> or a named <see cref="EventSequenceData"/> in response to
+    /// common Unity scene lifecycle events or physics triggers without requiring any code.
     /// </summary>
     [AddComponentMenu("EventManager/Event Trigger")]
     public class EventTrigger : MonoBehaviour
     {
         // ─── Inspector ───────────────────────────────────────────────────────────
-        [Tooltip("Name of the event to fire.")]
+        [Tooltip("Name of the event to fire, or leave empty when using Sequence mode.")]
         [SerializeField] private string eventName;
 
-        [Tooltip("Optional string payload attached to the event.")]
+        [Tooltip("If set, fire this sequence id instead of a single event.")]
+        [SerializeField] private string sequenceId;
+
+        [Tooltip("Optional string payload attached to the event (ignored in Sequence mode).")]
         [SerializeField] private string stringPayload;
 
-        [Tooltip("Optional integer payload attached to the event.")]
+        [Tooltip("Optional integer payload attached to the event (ignored in Sequence mode).")]
         [SerializeField] private int intPayload;
 
         [SerializeField] private EventTriggerMode triggerMode = EventTriggerMode.OnTriggerEnter;
@@ -104,10 +107,18 @@ namespace EventManager.Runtime
         {
             if (fireOnce && _fired) return;
             if (_events == null) return;
-            if (string.IsNullOrEmpty(eventName)) return;
 
             _fired = true;
 
+            // Sequence mode
+            if (!string.IsNullOrEmpty(sequenceId))
+            {
+                _events.FireSequence(sequenceId);
+                return;
+            }
+
+            // Single-event mode
+            if (string.IsNullOrEmpty(eventName)) return;
             var evt = new GameEvent(eventName, stringPayload, intPayload);
             _events.Fire(evt);
         }

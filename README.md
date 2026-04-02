@@ -1,6 +1,6 @@
 # EventManager
 
-A standalone Unity package providing a global named-channel event bus. Any system can fire or subscribe to typed `GameEvent`s without holding a reference to the sender — fully decoupled. Optionally integrates with MapLoaderFramework and CutsceneManager.
+A standalone Unity package providing a global named-channel event bus. Any system can fire or subscribe to typed `GameEvent`s without holding a reference to the sender — fully decoupled. Supports JSON-authored event definitions and timed event sequences. Optionally integrates with MapLoaderFramework, CutsceneManager, and more.
 
 ## Features
 
@@ -10,7 +10,10 @@ A standalone Unity package providing a global named-channel event bus. Any syste
 - Typed `GameEvent` payload: `stringValue`, `intValue`, `floatValue`, `objectValue`
 - Per-handler exception isolation — one bad handler never silences others
 - Event history log with configurable capacity (Inspector-visible at runtime)
-- `EventTrigger` component for scene pickups, zone entry/exit, lifecycle events — zero code
+- **JSON event definitions** — author named channels with default payloads, labels, descriptions and tags in `Resources/Events/*.json`
+- **JSON event sequences** — chain timed event firings in `Resources/EventSequences/*.json`; fire sequences from code or `EventTrigger`
+- Hot-reload from `persistentDataPath/Events/` and `persistentDataPath/EventSequences/` for mods / DLC
+- `EventTrigger` component for scene pickups, zone entry/exit, lifecycle events — zero code; supports sequence mode
 - **Optional** MapLoaderFramework bridge — fires `map.loaded` and `chapter.changed`
 - **Optional** CutsceneManager bridge — fires `cutscene.started`, `cutscene.completed`, `cutscene.skipped`, and custom cutscene events
 - **Optional** SaveManager bridge — fires `save.saved`, `save.loaded`, `save.deleted`, and `flag.changed` from SaveManager operations (activated via `EVENTMANAGER_SM`)
@@ -45,9 +48,9 @@ npm install
 ```
 EventManager/
 ├── Runtime/
-│   ├── EventData.cs               # GameEvent data class
-│   ├── EventManager.cs            # Global event bus (MonoBehaviour)
-│   ├── EventTrigger.cs            # Scene trigger component
+│   ├── EventData.cs               # GameEvent, EventDefinitionData, EventSequenceData
+│   ├── EventManager.cs            # Global event bus (MonoBehaviour) + JSON loader
+│   ├── EventTrigger.cs            # Scene trigger component (event + sequence mode)
 │   ├── MapLoaderEventBridge.cs    # Optional: MLF integration
 │   ├── CutsceneEventBridge.cs     # Optional: CutsceneManager integration
 │   ├── SaveEventBridge.cs         # Optional: SaveManager integration
@@ -111,18 +114,66 @@ events.Off("player.died", OnDied);
 
 ### 5. EventTrigger Component
 
-Add `EventTrigger` to any scene object to fire an event without code:
+Add `EventTrigger` to any scene object to fire an event or sequence without code:
 
 | Field | Description |
 | ----- | ----------- |
-| `Event Name` | Event to fire |
-| `String Payload` | Optional string value |
-| `Int Payload` | Optional integer value |
+| `Event Name` | Event to fire (leave empty when using Sequence mode) |
+| `Sequence Id` | Sequence to fire instead of a single event |
+| `String Payload` | Optional string value (ignored in Sequence mode) |
+| `Int Payload` | Optional integer value (ignored in Sequence mode) |
 | `Trigger Mode` | `OnStart`, `OnEnable`, `OnDisable`, `OnDestroy`, `OnTriggerEnter`, `OnTriggerExit`, `OnInteract` |
 | `Fire Once` | Only fire once per scene lifetime |
 | `Trigger Tag` | Collider tag filter (default: `"Player"`) |
 
 Call `eventTrigger.Interact()` from code to fire an `OnInteract`-mode trigger.
+
+### 6. JSON Event Definitions
+
+Place one definition per `.json` file in `Assets/Resources/Events/`:
+
+```json
+{
+  "id": "player.died",
+  "label": "Player Died",
+  "description": "Fired when the player loses all HP.",
+  "defaultStringValue": "",
+  "defaultIntValue": 0,
+  "defaultFloatValue": 0,
+  "tags": ["player", "combat"]
+}
+```
+
+Fire using defaults defined in JSON:
+
+```csharp
+events.FireWithDefaults("player.died");
+```
+
+### 7. JSON Event Sequences
+
+Place one sequence per `.json` file in `Assets/Resources/EventSequences/`:
+
+```json
+{
+  "id": "chapter.start",
+  "label": "Chapter Start",
+  "steps": [
+    { "eventName": "screen.fade.in",  "delayBefore": 0.0 },
+    { "eventName": "music.start",     "stringValue": "chapter_theme", "delayBefore": 0.5 },
+    { "eventName": "chapter.started", "intValue": 1, "delayBefore": 1.0 }
+  ]
+}
+```
+
+Fire a sequence from code:
+
+```csharp
+events.FireSequence("chapter.start");
+events.StopSequence();
+```
+
+Or set `Sequence Id` on an `EventTrigger` component to fire it from the scene without code.
 
 
 ## GameEvent Fields
@@ -266,6 +317,8 @@ Add `LocalizationEventBridge` to the same GameObject as `EventManager` and `Loca
 
 ### EventManager
 
+#### Event Bus
+
 | Member | Description |
 | ------ | ----------- |
 | `Fire(GameEvent evt)` | Fire a fully constructed event |
@@ -273,6 +326,7 @@ Add `LocalizationEventBridge` to the same GameObject as `EventManager` and `Loca
 | `Fire(string name, string str)` | Fire with string payload |
 | `Fire(string name, int intVal)` | Fire with int payload |
 | `Fire(string name, float floatVal)` | Fire with float payload |
+| `FireWithDefaults(string name)` | Fire using default payloads from the loaded definition |
 | `On(string name, Action<GameEvent>)` | Persistent subscription |
 | `Off(string name, Action<GameEvent>)` | Unsubscribe |
 | `Once(string name, Action<GameEvent>)` | One-shot subscription |
@@ -282,6 +336,57 @@ Add `LocalizationEventBridge` to the same GameObject as `EventManager` and `Loca
 | `GetHistory() → IReadOnlyList<GameEvent>` | Recent event log |
 | `GetActiveChannels()` | All channels with at least one subscriber |
 | `ClearHistory()` | Empty the history log |
+
+#### JSON Loading
+
+| Member | Description |
+| ------ | ----------- |
+| `LoadAllDefinitions()` | Reload definitions from `Resources/Events/` and `persistentDataPath/Events/` |
+| `LoadAllSequences()` | Reload sequences from `Resources/EventSequences/` and `persistentDataPath/EventSequences/` |
+| `GetDefinition(string id) → EventDefinitionData` | Look up a loaded definition by id |
+| `GetAllDefinitions()` | All loaded event definitions |
+| `GetSequence(string id) → EventSequenceData` | Look up a loaded sequence by id |
+| `GetAllSequences()` | All loaded event sequences |
+
+#### Sequences
+
+| Member | Description |
+| ------ | ----------- |
+| `FireSequence(string id)` | Fire a named sequence by id |
+| `FireSequence(EventSequenceData)` | Fire a sequence instance directly |
+| `StopSequence()` | Stop the currently running sequence |
+| `OnSequenceStarted` | Event fired when a sequence begins (sequence id) |
+| `OnSequenceCompleted` | Event fired when a sequence finishes (sequence id) |
+
+### EventDefinitionData (JSON fields)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Unique channel name |
+| `label` | string | Human-readable label |
+| `description` | string | When/why this event fires |
+| `defaultStringValue` | string | Default string payload for `FireWithDefaults` |
+| `defaultIntValue` | int | Default int payload |
+| `defaultFloatValue` | float | Default float payload |
+| `tags` | string[] | Optional grouping tags |
+
+### EventSequenceData (JSON fields)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | string | Unique sequence identifier |
+| `label` | string | Human-readable label |
+| `steps` | EventSequenceStep[] | Ordered list of steps |
+
+### EventSequenceStep (JSON fields)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `eventName` | string | Event to fire |
+| `stringValue` | string | String payload |
+| `intValue` | int | Integer payload |
+| `floatValue` | float | Float payload |
+| `delayBefore` | float | Seconds to wait before firing this step |
 
 
 ## Integration Defines Summary
@@ -294,6 +399,16 @@ Add `LocalizationEventBridge` to the same GameObject as `EventManager` and `Loca
 | `EVENTMANAGER_DM` | EventManager fires dialogue lifecycle events from DialogueManager |
 | `EVENTMANAGER_IM` | EventManager fires item added/removed/used events from InventoryManager |
 | `EVENTMANAGER_LM` | EventManager fires `language.changed` from LocalizationManager |
+
+
+## JSON File Locations
+
+| Content | Bundled path | Hot-reload / mod path |
+| ------- | ------------ | --------------------- |
+| Event definitions | `Assets/Resources/Events/*.json` | `persistentDataPath/Events/*.json` |
+| Event sequences | `Assets/Resources/EventSequences/*.json` | `persistentDataPath/EventSequences/*.json` |
+
+Toggle hot-reload with the **Load From Persistent Data Path** checkbox on the `EventManager` component.
 
 
 ## Examples

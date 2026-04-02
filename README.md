@@ -19,6 +19,8 @@ A standalone Unity package providing a global named-channel event bus. Any syste
 - **Optional** SaveManager bridge — fires `save.saved`, `save.loaded`, `save.deleted`, and `flag.changed` from SaveManager operations (activated via `EVENTMANAGER_SM`)
 - **Optional** DialogueManager bridge — fires `dialogue.started`, `dialogue.completed`, and `dialogue.node` from DialogueManager (activated via `EVENTMANAGER_DM`)
 - **Optional** InventoryManager bridge — fires `item.added`, `item.removed`, and `item.used` from InventoryManager (activated via `EVENTMANAGER_IM`)
+- **Optional** MiniGameManager bridge — fires `minigame.started`, `minigame.completed`, and `minigame.aborted` from MiniGameManager (activated via `EVENTMANAGER_MGM`)
+- **Optional** DlcManager bridge — fires `dlc.unlocked` and `dlc.revoked` from DlcManager (activated via `EVENTMANAGER_DLC`)
 - **Optional** LocalizationManager bridge — fires `language.changed` when the active language switches (activated via `EVENTMANAGER_LM`)
 
 
@@ -56,6 +58,8 @@ EventManager/
 │   ├── SaveEventBridge.cs         # Optional: SaveManager integration
 │   ├── DialogueEventBridge.cs     # Optional: DialogueManager integration
 │   ├── InventoryEventBridge.cs    # Optional: InventoryManager integration
+│   ├── MiniGameEventBridge.cs     # Optional: MiniGameManager integration
+│   └── DlcEventBridge.cs          # Optional: DlcManager integration
 │   └── LocalizationEventBridge.cs # Optional: LocalizationManager integration
 ├── Editor/
 │   └── EventManagerEditor.cs      # Custom inspector
@@ -313,6 +317,39 @@ Add `LocalizationEventBridge` to the same GameObject as `EventManager` and `Loca
 | `Language Changed Event Name` | `"language.changed"` | Configurable event name |
 
 
+## MiniGameManager Integration
+
+Enable `EVENTMANAGER_MGM` in Player Settings › Scripting Define Symbols.
+
+Add `MiniGameEventBridge` to the same GameObject as `EventManager` and `MiniGameManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"minigame.started"` | `OnMiniGameStarted` | `stringValue` = mini-game id |
+| `"minigame.completed"` | `OnMiniGameCompleted` | `stringValue` = mini-game id, `intValue` = score, `floatValue` = timestamp |
+| `"minigame.aborted"` | `OnMiniGameAborted` | `stringValue` = mini-game id |
+
+### Inspector Fields
+
+| Field | Default | Description |
+| ----- | ------- | ----------- |
+| `Started Event Name` | `"minigame.started"` | Configurable event name |
+| `Completed Event Name` | `"minigame.completed"` | Configurable event name |
+| `Aborted Event Name` | `"minigame.aborted"` | Configurable event name |
+
+
+## DlcManager Integration
+
+Enable `EVENTMANAGER_DLC` in Player Settings › Scripting Define Symbols.
+
+Add `DlcEventBridge` to the same GameObject as `EventManager` and `DlcManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"dlc.unlocked"` | `OnPackUnlocked` | `stringValue` = pack id |
+| `"dlc.revoked"` | `OnPackRevoked` | `stringValue` = pack id |
+
+
 ## Runtime API
 
 ### EventManager
@@ -399,6 +436,8 @@ Add `LocalizationEventBridge` to the same GameObject as `EventManager` and `Loca
 | `EVENTMANAGER_DM` | EventManager fires dialogue lifecycle events from DialogueManager |
 | `EVENTMANAGER_IM` | EventManager fires item added/removed/used events from InventoryManager |
 | `EVENTMANAGER_LM` | EventManager fires `language.changed` from LocalizationManager |
+| `EVENTMANAGER_MGM` | EventManager fires mini-game started/completed/aborted events from MiniGameManager |
+| `EVENTMANAGER_DLC` | EventManager fires DLC pack unlocked/revoked events from DlcManager |
 
 
 ## JSON File Locations
@@ -427,6 +466,8 @@ See `Examples/Scripts/example_event_listener.lua` for subscribing, firing, and o
 | DialogueManager | Optional — enable `EVENTMANAGER_DM` |
 | InventoryManager | Optional — enable `EVENTMANAGER_IM` |
 | LocalizationManager | Optional — enable `EVENTMANAGER_LM` |
+| MiniGameManager | Optional — enable `EVENTMANAGER_MGM` |
+| DlcManager | Optional — enable `EVENTMANAGER_DLC` |
 
 
 ## Repository

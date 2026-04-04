@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace EventManager.Runtime
 {
@@ -24,7 +27,11 @@ namespace EventManager.Runtime
     /// </summary>
     [AddComponentMenu("EventManager/Event Manager")]
     [DisallowMultipleComponent]
+#if ODIN_INSPECTOR
+    public class EventManager : SerializedMonoBehaviour
+#else
     public class EventManager : MonoBehaviour
+#endif
     {
         // ─── Inspector ───────────────────────────────────────────────────────────
         [Tooltip("Maximum number of events kept in the history log.")]
@@ -37,7 +44,13 @@ namespace EventManager.Runtime
         [SerializeField] private bool loadFromPersistentDataPath = true;
 
         [Header("Loaded data (read-only, set at runtime)")]
+#if ODIN_INSPECTOR
+        [ReadOnly]
+#endif
         [SerializeField] private List<string> loadedDefinitionIds  = new List<string>();
+#if ODIN_INSPECTOR
+        [ReadOnly]
+#endif
         [SerializeField] private List<string> loadedSequenceIds    = new List<string>();
 
         // ─── State ───────────────────────────────────────────────────────────────

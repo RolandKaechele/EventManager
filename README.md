@@ -27,6 +27,7 @@ A standalone Unity package providing a global named-channel event bus. Any syste
 - **Optional** UiManager bridge — fires `ui.panel.shown`, `ui.panel.hidden` from UiManager (activated via `EVENTMANAGER_UIM`)
 - **Optional** InputManager bridge — fires `input.profileChanged`, `input.blocked`, `input.unblocked` from InputManager (activated via `EVENTMANAGER_INP`)
 - **Optional** CameraManager bridge — fires `camera.changed`, `camera.pushed`, `camera.popped` from CameraManager (activated via `EVENTMANAGER_CAM`)
+- **Odin Inspector integration** — `SerializedMonoBehaviour` base for full Inspector serialization of complex types; runtime-display fields marked `[ReadOnly]` in Play Mode (activated via `ODIN_INSPECTOR`)
 
 
 ## Installation
@@ -547,6 +548,7 @@ See `Examples/Scripts/example_event_listener.lua` for subscribing, firing, and o
 | LocalizationManager | Optional — enable `EVENTMANAGER_LM` |
 | MiniGameManager | Optional — enable `EVENTMANAGER_MGM` |
 | DlcManager | Optional — enable `EVENTMANAGER_DLC` |
+| Odin Inspector | Optional — enable `ODIN_INSPECTOR` |
 
 
 ## Repository

@@ -22,6 +22,7 @@ A standalone Unity package providing a global named-channel event bus. Any syste
 - **Optional** MiniGameManager bridge — fires `minigame.started`, `minigame.completed`, and `minigame.aborted` from MiniGameManager (activated via `EVENTMANAGER_MGM`)
 - **Optional** DlcManager bridge — fires `dlc.unlocked` and `dlc.revoked` from DlcManager (activated via `EVENTMANAGER_DLC`)
 - **Optional** LocalizationManager bridge — fires `language.changed` when the active language switches (activated via `EVENTMANAGER_LM`)
+- **Optional** StateManager bridge — fires `state.changed`, `state.pushed`, `state.popped` whenever StateManager transitions (activated via `EVENTMANAGER_STM`)
 
 
 ## Installation

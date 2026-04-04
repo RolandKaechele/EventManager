@@ -23,6 +23,10 @@ A standalone Unity package providing a global named-channel event bus. Any syste
 - **Optional** DlcManager bridge — fires `dlc.unlocked` and `dlc.revoked` from DlcManager (activated via `EVENTMANAGER_DLC`)
 - **Optional** LocalizationManager bridge — fires `language.changed` when the active language switches (activated via `EVENTMANAGER_LM`)
 - **Optional** StateManager bridge — fires `state.changed`, `state.pushed`, `state.popped` whenever StateManager transitions (activated via `EVENTMANAGER_STM`)
+- **Optional** AnimationManager bridge — fires `animation.started`, `animation.stopped`, `animation.completed` from AnimationManager (activated via `EVENTMANAGER_ANM`)
+- **Optional** UiManager bridge — fires `ui.panel.shown`, `ui.panel.hidden` from UiManager (activated via `EVENTMANAGER_UIM`)
+- **Optional** InputManager bridge — fires `input.profileChanged`, `input.blocked`, `input.unblocked` from InputManager (activated via `EVENTMANAGER_INP`)
+- **Optional** CameraManager bridge — fires `camera.changed`, `camera.pushed`, `camera.popped` from CameraManager (activated via `EVENTMANAGER_CAM`)
 
 
 ## Installation
@@ -62,6 +66,11 @@ EventManager/
 │   ├── MiniGameEventBridge.cs     # Optional: MiniGameManager integration
 │   └── DlcEventBridge.cs          # Optional: DlcManager integration
 │   └── LocalizationEventBridge.cs # Optional: LocalizationManager integration
+│   └── StateEventBridge.cs        # Optional: StateManager integration
+│   └── AnimationEventBridge.cs    # Optional: AnimationManager integration
+│   └── UiEventBridge.cs           # Optional: UiManager integration
+│   └── InputEventBridge.cs        # Optional: InputManager integration
+│   └── CameraEventBridge.cs       # Optional: CameraManager integration
 ├── Editor/
 │   └── EventManagerEditor.cs      # Custom inspector
 ├── Examples/
@@ -351,6 +360,70 @@ Add `DlcEventBridge` to the same GameObject as `EventManager` and `DlcManager`.
 | `"dlc.revoked"` | `OnPackRevoked` | `stringValue` = pack id |
 
 
+## StateManager Integration
+
+Enable `EVENTMANAGER_STM` in Player Settings › Scripting Define Symbols.
+
+Add `StateEventBridge` to the same GameObject as `EventManager` and `StateManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"state.changed"` | `OnStateChanged` | `stringValue` = new state name |
+| `"state.pushed"` | `OnStatePushed` | `stringValue` = pushed state name |
+| `"state.popped"` | `OnStatePopped` | `stringValue` = popped state name |
+
+
+## AnimationManager Integration
+
+Enable `EVENTMANAGER_ANM` in Player Settings › Scripting Define Symbols.
+
+Add `AnimationEventBridge` to the same GameObject as `EventManager` and `AnimationManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"animation.started"` | `OnAnimationStarted` | `stringValue` = animation id |
+| `"animation.stopped"` | `OnAnimationStopped` | `stringValue` = animation id |
+| `"animation.completed"` | `OnAnimationCompleted` | `stringValue` = animation id |
+
+
+## UiManager Integration
+
+Enable `EVENTMANAGER_UIM` in Player Settings › Scripting Define Symbols.
+
+Add `UiEventBridge` to the same GameObject as `EventManager` and `UiManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"ui.panel.shown"` | `OnPanelShown` | `stringValue` = panel id |
+| `"ui.panel.hidden"` | `OnPanelHidden` | `stringValue` = panel id |
+
+
+## InputManager Integration
+
+Enable `EVENTMANAGER_INP` in Player Settings › Scripting Define Symbols.
+
+Add `InputEventBridge` to the same GameObject as `EventManager` and `InputManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"input.profileChanged"` | `OnProfileChanged` | `stringValue` = new profile id |
+| `"input.blocked"` | `OnInputBlocked` | *(no payload)* |
+| `"input.unblocked"` | `OnInputUnblocked` | *(no payload)* |
+
+
+## CameraManager Integration
+
+Enable `EVENTMANAGER_CAM` in Player Settings › Scripting Define Symbols.
+
+Add `CameraEventBridge` to the same GameObject as `EventManager` and `CameraManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"camera.changed"` | `OnCameraChanged` | `stringValue` = new camera id |
+| `"camera.pushed"` | `OnCameraPushed` | `stringValue` = pushed camera id |
+| `"camera.popped"` | `OnCameraPopped` | `stringValue` = popped camera id |
+
+
 ## Runtime API
 
 ### EventManager
@@ -439,6 +512,11 @@ Add `DlcEventBridge` to the same GameObject as `EventManager` and `DlcManager`.
 | `EVENTMANAGER_LM` | EventManager fires `language.changed` from LocalizationManager |
 | `EVENTMANAGER_MGM` | EventManager fires mini-game started/completed/aborted events from MiniGameManager |
 | `EVENTMANAGER_DLC` | EventManager fires DLC pack unlocked/revoked events from DlcManager |
+| `EVENTMANAGER_STM` | EventManager fires `state.changed/pushed/popped` from StateManager |
+| `EVENTMANAGER_ANM` | EventManager fires `animation.started/stopped/completed` from AnimationManager |
+| `EVENTMANAGER_UIM` | EventManager fires `ui.panel.shown/hidden` from UiManager |
+| `EVENTMANAGER_INP` | EventManager fires `input.profileChanged/blocked/unblocked` from InputManager |
+| `EVENTMANAGER_CAM` | EventManager fires `camera.changed/pushed/popped` from CameraManager |
 
 
 ## JSON File Locations

@@ -27,6 +27,8 @@ A standalone Unity package providing a global named-channel event bus. Any syste
 - **Optional** UiManager bridge — fires `ui.panel.shown`, `ui.panel.hidden` from UiManager (activated via `EVENTMANAGER_UIM`)
 - **Optional** InputManager bridge — fires `input.profileChanged`, `input.blocked`, `input.unblocked` from InputManager (activated via `EVENTMANAGER_INP`)
 - **Optional** CameraManager bridge — fires `camera.changed`, `camera.pushed`, `camera.popped` from CameraManager (activated via `EVENTMANAGER_CAM`)
+- **Optional** AiManager bridge — fires `ai.alertlevel.changed`, `ai.boss.phase.changed`, `ai.frozen`, `ai.unfrozen` from AiManager (activated via `EVENTMANAGER_AIM`)
+- **Optional** EnemyManager bridge — fires `enemy.spawned`, `enemy.defeated`, `enemy.wave.*` from EnemyManager (activated via `EVENTMANAGER_ENM`)
 - **Odin Inspector integration** — `SerializedMonoBehaviour` base for full Inspector serialization of complex types; runtime-display fields marked `[ReadOnly]` in Play Mode (activated via `ODIN_INSPECTOR`)
 
 
@@ -425,6 +427,35 @@ Add `CameraEventBridge` to the same GameObject as `EventManager` and `CameraMana
 | `"camera.popped"` | `OnCameraPopped` | `stringValue` = popped camera id |
 
 
+## AiManager Integration
+
+Enable `EVENTMANAGER_AIM` in Player Settings › Scripting Define Symbols.
+
+Add `AiEventBridge` to the same GameObject as `EventManager` and `AiManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"ai.alertlevel.changed"` | `OnAlertLevelChanged` | `intValue` = new level (0–3) |
+| `"ai.boss.phase.changed"` | `OnBossPhaseChanged` | `stringValue` = bossId, `intValue` = phase |
+| `"ai.frozen"` | `OnAiFrozenChanged(true)` | *(no payload)* |
+| `"ai.unfrozen"` | `OnAiFrozenChanged(false)` | *(no payload)* |
+
+
+## EnemyManager Integration
+
+Enable `EVENTMANAGER_ENM` in Player Settings › Scripting Define Symbols.
+
+Add `EnemyEventBridge` to the same GameObject as `EventManager` and `EnemyManager`.
+
+| Event Fired | Trigger | Payload |
+| ----------- | ------- | ------- |
+| `"enemy.spawned"` | `OnEnemySpawned` | `stringValue` = instanceId |
+| `"enemy.defeated"` | `OnEnemyDefeated` | `stringValue` = instanceId |
+| `"enemy.wave.started"` | `OnWaveStarted` | `stringValue` = waveId |
+| `"enemy.wave.completed"` | `OnWaveCompleted` | `stringValue` = waveId |
+| `"enemy.wave.aborted"` | `OnWaveAborted` | `stringValue` = waveId |
+
+
 ## Runtime API
 
 ### EventManager
@@ -518,6 +549,8 @@ Add `CameraEventBridge` to the same GameObject as `EventManager` and `CameraMana
 | `EVENTMANAGER_UIM` | EventManager fires `ui.panel.shown/hidden` from UiManager |
 | `EVENTMANAGER_INP` | EventManager fires `input.profileChanged/blocked/unblocked` from InputManager |
 | `EVENTMANAGER_CAM` | EventManager fires `camera.changed/pushed/popped` from CameraManager |
+| `EVENTMANAGER_AIM` | EventManager fires `ai.alertlevel.changed`, `ai.boss.phase.changed`, `ai.frozen/unfrozen` from AiManager |
+| `EVENTMANAGER_ENM` | EventManager fires `enemy.spawned/defeated` and `enemy.wave.*` from EnemyManager |
 
 
 ## JSON File Locations
@@ -548,6 +581,8 @@ See `Examples/Scripts/example_event_listener.lua` for subscribing, firing, and o
 | LocalizationManager | Optional — enable `EVENTMANAGER_LM` |
 | MiniGameManager | Optional — enable `EVENTMANAGER_MGM` |
 | DlcManager | Optional — enable `EVENTMANAGER_DLC` |
+| AiManager | Optional — enable `EVENTMANAGER_AIM` |
+| EnemyManager | Optional — enable `EVENTMANAGER_ENM` |
 | Odin Inspector | Optional — enable `ODIN_INSPECTOR` |
 
 

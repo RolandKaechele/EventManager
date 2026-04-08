@@ -1,29 +1,29 @@
 {
-  "name": "com.rolandkaechele.eventmanager",
-  "displayName": "Event Manager",
-  "version": "1.0.0",
-  "unity": "2022.3",
-  "description": "A global named-channel event bus for Unity. Fire and subscribe to typed GameEvents without hard dependencies. Optionally integrates with MapLoaderFramework and CutsceneManager.",
-  "author": {
-    "name": "Roland Kaechele",
-    "url": "https://github.com/RolandKaechele/EventManager"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/RolandKaechele/EventManager.git"
-  },
-  "license": "MIT",
-  "keywords": [
-    "unity",
-    "events",
-    "eventbus",
-    "messaging",
-    "decoupling",
-    "rpg",
-    "framework"
-  ],
-  "documentationUrl": "https://github.com/RolandKaechele/EventManager#readme",
-  "scripts": {
-    "postinstall": "node postinstall.js"
-  }
+    "name":  "com.rolandkaechele.eventmanager",
+    "displayName":  "Event Manager",
+    "version":  "1.0.0",
+    "unity":  "2022.3",
+    "description":  "A global named-channel event bus for Unity. Fire and subscribe to typed GameEvents without hard dependencies. Optionally integrates with MapLoaderFramework and CutsceneManager.",
+    "author":  {
+                   "name":  "Roland Kaechele",
+                   "url":  "https://github.com/RolandKaechele/EventManager"
+               },
+    "repository":  {
+                       "type":  "git",
+                       "url":  "https://github.com/RolandKaechele/EventManager.git"
+                   },
+    "license":  "MIT",
+    "keywords":  [
+                     "unity",
+                     "events",
+                     "eventbus",
+                     "messaging",
+                     "decoupling",
+                     "rpg",
+                     "framework"
+                 ],
+    "documentationUrl":  "https://github.com/RolandKaechele/EventManager#readme",
+    "scripts":  {
+                    "postinstall":  "node postinstall.js"
+                }
 }

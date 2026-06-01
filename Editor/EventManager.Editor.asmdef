@@ -1,8 +1,9 @@
-﻿{
+{
     "name": "EventManager.Editor",
     "rootNamespace": "EventManager.Editor",
     "references": [
-        "EventManager.Runtime"
+        "EventManager.Runtime",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"

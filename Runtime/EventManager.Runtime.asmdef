@@ -1,4 +1,4 @@
-﻿{
+{
     "name": "EventManager.Runtime",
     "rootNamespace": "EventManager.Runtime",
     "references": [],
